@@ -1,6 +1,5 @@
 import type {StatusField} from "../Types/Protocol.type.ts";
 import {Anchor, Checkbox, Grid, Paper, Text, TextInput, Tooltip} from "@mantine/core";
-import {KLARNAME} from "../Klarnamen.ts";
 import {IoMdInformationCircleOutline} from "react-icons/io";
 import dayjs from "dayjs";
 
@@ -13,25 +12,20 @@ interface Props {
 
 export function ProtocolField({name, onUpdate, protocolData, phase}: Props) {
 
-    const handleStatusChange = (newStatus: "ok" | "na") => {
+    const updateField = (updates: Partial<StatusField>) => {
         const updatedValue: StatusField = {
             ...protocolData,
-            status: protocolData.status === newStatus ? "empty" : newStatus,
-            lastModifiedAt: new Date().toISOString(),
-            modifiedBy: 'current_user',
-            freitext: ""
-        }
-        onUpdate(updatedValue)
-    }
-    const handleFreitextChange = (text: string) => {
-        const updatedValue: StatusField = {
-            ...protocolData,
-            status: "empty",
-            freitext: text,
+            ...updates,
             lastModifiedAt: new Date().toISOString(),
             modifiedBy: 'current_user'
         }
         onUpdate(updatedValue)
+    }
+
+    const isPhase1ItemInPhase2 = phase === "2" && protocolData.phase === "1"
+    const isTextInputDisabled = (protocolData.status === "ok" || protocolData.status === "na") || isPhase1ItemInPhase2
+    const inputStyles = {
+        input: {borderColor: 'rgba(5,5,5,0.4)'}
     }
 
     return (
@@ -40,48 +34,39 @@ export function ProtocolField({name, onUpdate, protocolData, phase}: Props) {
                 <Grid.Col span={6}>
                     {protocolData.link ?
                         <Anchor href={protocolData.link} target={"_blank"} rel="noopener noreferrer">
-                            {KLARNAME[name] || name}
+                            {name}
                         </Anchor> :
-                        <Text>{KLARNAME[name] || name}</Text>
+                        <Text>{name}</Text>
                     }
                 </Grid.Col>
                 <Grid.Col span={2} className="flex justify-center">
                     <Checkbox
-                        styles={{
-                            input: {
-                                borderColor: 'rgba(5,5,5,0.4)',
-                            }
-                        }}
-                        disabled={phase === "2" && protocolData.phase === "1"}
+                        styles={inputStyles}
+                        disabled={isPhase1ItemInPhase2}
                         checked={protocolData.status === "ok"}
-                        onChange={() => handleStatusChange("ok")}
+                        onChange={() => updateField({
+                            status: protocolData.status === "ok" ? "empty" : "ok",
+                            freitext: ""
+                        })}
                     />
                 </Grid.Col>
                 <Grid.Col span={2} className="flex justify-center">
                     <Checkbox
-                        styles={{
-                            input: {
-                                borderColor: 'rgba(5,5,5,0.4)',
-                            }
-                        }}
-                        disabled={phase === "2" && protocolData.phase === "1"}
-
+                        styles={inputStyles}
+                        disabled={isPhase1ItemInPhase2}
                         checked={protocolData.status === "na"}
-                        onChange={() => handleStatusChange("na")}
+                        onChange={() => updateField({
+                            status: protocolData.status === "na" ? "empty" : "na",
+                            freitext: ""
+                        })}
                     />
                 </Grid.Col>
                 <Grid.Col span={2} className="flex justify-center gap-2">
                     <TextInput
-                        styles={{
-                            input: {
-                                borderColor: 'rgba(5,5,5,0.4)',
-                            },
-                        }}
+                        styles={inputStyles}
                         radius="md"
-                        disabled={(
-                                protocolData.status === "na" || protocolData.status === "ok") ||
-                            (phase === "2" && protocolData.phase === "1")}
-                        onChange={(event) => handleFreitextChange(event.currentTarget.value)}
+                        disabled={isTextInputDisabled}
+                        onChange={(event) => updateField({freitext: event.currentTarget.value})}
                         value={protocolData.freitext}
                     />
                     <Tooltip
