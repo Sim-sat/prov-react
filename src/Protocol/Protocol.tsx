@@ -1,4 +1,4 @@
-import type {StatusField} from "../Types/Protocol.type.ts";
+import type {StatusField} from "./Protocol.type.ts";
 import {ProtocolField} from "./ProtocolField.tsx";
 import {Grid, Paper, Stack, Text} from "@mantine/core";
 

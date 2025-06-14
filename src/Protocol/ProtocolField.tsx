@@ -1,4 +1,4 @@
-import type {StatusField} from "../Types/Protocol.type.ts";
+import type {StatusField} from "./Protocol.type.ts";
 import {Anchor, Checkbox, Grid, Paper, Text, TextInput, Tooltip} from "@mantine/core";
 import {IoMdInformationCircleOutline} from "react-icons/io";
 import dayjs from "dayjs";
