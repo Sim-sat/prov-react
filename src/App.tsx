@@ -4,20 +4,23 @@ import {Button, Group, MantineProvider, Stack, Textarea} from '@mantine/core';
 import type {ProtocolType, StatusField} from "./Types/Protocol.type.ts";
 import {Protocol} from "./Components/Protocol.tsx";
 import '@mantine/dates/styles.css';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {DateInput} from "@mantine/dates";
-import {TESTPHASE2} from "./testdata.ts";
+import jsonData from "./input.json";
 
 function App() {
-    const [protocolData, setProtocolData] = useState<ProtocolType>(TESTPHASE2);
+
+    const [protocolData, setProtocolData] = useState<ProtocolType>(jsonData);
     const [hidePhase1, setHidePhase1] = useState<boolean>(false)
 
-    const updateField = (categoryName: string, fieldKey: string, newValue: StatusField) => {
+    const updateField = (category: string, field: string, newValue: StatusField) => {
         setProtocolData(prev => {
-            const newData = new Map(prev.data)
-            const categoryMap = new Map(newData.get(categoryName))
-            categoryMap.set(fieldKey, newValue)
-            newData.set(categoryName, categoryMap)
+            const newData = {
+                ...prev.data, [category]: {
+                    ...prev.data[category],
+                    [field]: newValue
+                }
+            };
             return {...prev, data: newData}
         })
     }
@@ -28,23 +31,26 @@ function App() {
 
     const emptyFields = () => {
         setProtocolData(prev => {
-            const newData = new Map<string, Map<string, StatusField>>();
-            [...prev.data.entries()].forEach(([categoryName, categoryFields]) => {
-                const emptyFields = new Map<string, StatusField>();
-                [...categoryFields.entries()].forEach(([fieldKey, oldField]) => {
+            const newData: { [categoryName: string]: { [fieldKey: string]: StatusField } } = {};
+
+            Object.entries(prev.data).forEach(([categoryName, categoryFields]) => {
+                const emptyFields: { [fieldKey: string]: StatusField } = {};
+
+                Object.entries(categoryFields).forEach(([fieldKey, oldField]) => {
                     if ((protocolData.phase === "1") || ((protocolData.phase === "2") && (oldField.phase === "2"))) {
-                        emptyFields.set(fieldKey, {
+                        emptyFields[fieldKey] = {
                             status: 'abweichung',
                             freitext: "",
                             phase: oldField.phase,
                             link: oldField.link,
                             klarname: oldField.klarname,
-                        });
+                        };
                     } else {
-                        emptyFields.set(fieldKey, oldField)
+                        emptyFields[fieldKey] = oldField;
                     }
                 });
-                newData.set(categoryName, emptyFields);
+
+                newData[categoryName] = emptyFields;
             });
 
             return {
@@ -53,30 +59,56 @@ function App() {
                 comment: '',
                 date: ''
             };
-        })
-    }
+        });
+    };
 
-    const exportAsJSON = () => {
-        const result = {
-            phase: protocolData.phase,
-            comment: protocolData.comment,
-            date: protocolData.date,
-            data: Object.fromEntries(
-                [...protocolData.data.entries()].map(([key, fields]) =>
-                    [key, Object.fromEntries([...fields.entries()])])
-            )
+    const exportAsJSON = async (generatePdf: boolean = false, sendEmail: boolean = false) => {
+        try {
+            console.log(JSON.stringify(protocolData, null, 2))
+            const response = await fetch("protocol/edit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    protocolData: protocolData,
+                    generatePdf,
+                    sendEmail,
+                })
+            })
+            return await response.json();
+        } catch (error) {
+            console.error("Save failed ", error)
+            throw error
         }
-        console.log(JSON.stringify(result, null, 2))
+
     }
 
     const ExportButtons = () => (<Group className="mb-20" justify="center">
-            <Button radius="lg" variant="filled" onClick={exportAsJSON}>Speichern</Button>
-            <Button radius="lg" variant="filled" onClick={exportAsJSON}>Speichern und PDF erstellen</Button>
-            <Button radius="lg" variant="filled" onClick={exportAsJSON}>Speichern, PDF erstellen und
+            <Button radius="lg" variant="filled" onClick={() => exportAsJSON()}>Speichern</Button>
+            <Button radius="lg" variant="filled" onClick={() => exportAsJSON(true)}>Speichern und PDF erstellen</Button>
+            <Button radius="lg" variant="filled" onClick={() => exportAsJSON(true, true)}>Speichern, PDF erstellen und
                 verschicken</Button>
             <Button radius="lg" variant="filled" color="red" onClick={emptyFields}>Eingaben löschen</Button>
         </Group>
     )
+
+    useEffect(() => {
+        const getData = async (id: string) => {
+            const response = await fetch(`protocol/edit/${id}`, {
+                method: "GET",
+                headers: {
+                    contentType: "application/json",
+                }
+            })
+            if (!response.ok) {
+                throw new Error("Couldnt get data from api " + response.statusText)
+            }
+            return response.json()
+        }
+        //TODO get id from somewhere
+        getData("2").then(data => setProtocolData(data))
+    })
 
     return (
         <MantineProvider>
@@ -104,10 +136,10 @@ function App() {
                         <Button className="max-w-52" radius="lg" variant="filled"
                                 onClick={() => setHidePhase1(!hidePhase1)}>Phase 1
                             verstecken</Button>}
-                    {[...protocolData.data.entries()]
+                    {Object.entries(protocolData.data)
                         .filter(([, categoryEntries]) => { //filter to order the categories alphabetically
                             if (protocolData.phase === "2") return true;
-                            return [...categoryEntries.entries()].some(([, values]) =>
+                            return Object.entries(categoryEntries).some(([, values]) =>
                                 values.phase === "1"
                             );
                         })
@@ -115,6 +147,7 @@ function App() {
                             <Protocol
                                 onFieldUpdate={(fieldKey, newValue) => updateField(categoryName, fieldKey, newValue)}
                                 hidePhase1={hidePhase1}
+                                key={categoryName}
                                 phase={protocolData.phase}
                                 categoryName={categoryName}
                                 entries={categoryEntries}

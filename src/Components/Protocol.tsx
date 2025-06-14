@@ -3,10 +3,10 @@ import {ProtocolField} from "./ProtocolField.tsx";
 import {Grid, Paper, Stack, Text} from "@mantine/core";
 
 interface Props {
-    entries: Map<string, StatusField>
+    entries: { [field: string]: StatusField };
     categoryName: string
     onFieldUpdate: (fieldKey: string, newValue: StatusField) => void
-    phase: "1" | "2"
+    phase: string
     hidePhase1: boolean
 }
 
@@ -31,16 +31,16 @@ const ProtocolHeader = () => (
 
 export function Protocol({entries, categoryName, onFieldUpdate, phase, hidePhase1}: Props) {
 
-    const showField = (fieldPhase: "1" | "2") => (
+    const showField = (fieldPhase: string) => (
         (phase === "1" && fieldPhase === "1")
-        || (phase === "2" && (fieldPhase === "2") || (!hidePhase1)))
+        || (phase === "2" && (fieldPhase === "2" || (!hidePhase1))))
 
     return (
         <Stack w="100%" mt="xl">
             <p className="mb-5 font-bold text-3xl">{categoryName}</p>
             <ProtocolHeader/>
             <Stack justify="space-between">
-                {[...entries.entries()].map(([fieldKey, values]) => (
+                {Object.entries(entries).map(([fieldKey, values]) => (
                     ((showField(values.phase) && (
                             <ProtocolField
                                 key={fieldKey}

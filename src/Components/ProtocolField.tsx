@@ -7,7 +7,7 @@ interface Props {
     name: string
     onUpdate: (newValue: StatusField) => void
     protocolData: StatusField
-    phase: "1" | "2"
+    phase: string
 }
 
 export function ProtocolField({name, onUpdate, protocolData, phase}: Props) {

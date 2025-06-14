@@ -1,16 +1,20 @@
 export interface ProtocolType {
     date: string;
     comment: string;
-    phase: "1" | "2";
-    data: Map<string, Map<string, StatusField>>
+    phase: string
+    data: {
+        [category: string]: {
+            [field: string]: StatusField;
+        };
+    }
 }
 
 export interface StatusField {
-    status: 'ok' | 'na' | 'empty' | 'abweichung'
+    status: string
     klarname: string
     freitext: string;
     lastModifiedAt?: string;
     modifiedBy?: string;
-    phase: "1" | "2";
+    phase: string
     link?: string;
 }

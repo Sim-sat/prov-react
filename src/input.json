@@ -1,0 +1,133 @@
+{
+  "phase": "1",
+  "comment": "",
+  "date": "2025-06-10T14:30:00Z",
+  "data": {
+    "Maschine und Underlayfunktionen": {
+      "mul_netzwerkverkabelung": {
+        "status": "ok",
+        "phase": "1",
+        "lastModifiedAt": "2025-06-10T14:30:00Z",
+        "modifiedBy": "admin",
+        "link": "https://ui.mantine.dev/category/tables/",
+        "klarname": "Netzwerkverkabelung wie im Design vorgesehen",
+        "freitext": ""
+      },
+      "mul_stromversorgung": {
+        "status": "na",
+        "phase": "2",
+        "lastModifiedAt": "2025-06-10T14:32:00Z",
+        "modifiedBy": "admin",
+        "klarname": "Prüfung redundante Stromversorgungen (falls vorhanden)",
+        "freitext": ""
+      },
+      "mul_cluster_ha": {
+        "status": "ok",
+        "phase": "2",
+        "lastModifiedAt": "2025-06-10T14:35:00Z",
+        "modifiedBy": "techniker",
+        "link": "https://ui.mantine.dev/category/tables/",
+        "klarname": "Cluster HA-Links geprüft und Monitoring Interfaces geprüft",
+        "freitext": ""
+      },
+      "mul_wan": {
+        "status": "ok",
+        "phase": "1",
+        "freitext": "",
+        "lastModifiedAt": "2025-06-14T07:26:22.908Z",
+        "modifiedBy": "current_user",
+        "klarname": "WAN Prüfungen (ICMP Check und DNS-Prüfung)"
+      },
+      "mul_systemzeit": {
+        "status": "ok",
+        "phase": "2",
+        "lastModifiedAt": "2025-06-10T14:42:00Z",
+        "modifiedBy": "techniker",
+        "klarname": "Systemzeit auf dem Gerät stimmt mit der lokalen Zeit überein",
+        "freitext": ""
+      }
+    },
+    "Wartungszugriff": {
+      "wz_management_tunnel": {
+        "status": "ok",
+        "phase": "1",
+        "lastModifiedAt": "2025-06-10T15:00:00Z",
+        "modifiedBy": "admin",
+        "klarname": "VPN Management-Tunnel aufgebaut",
+        "freitext": ""
+      },
+      "wz_management_interface": {
+        "status": "ok",
+        "phase": "2",
+        "lastModifiedAt": "2025-06-10T15:05:00Z",
+        "modifiedBy": "admin",
+        "klarname": "Zugriff auf GUI/SSH über das Loopback Management Interface funktioniert",
+        "freitext": ""
+      },
+      "wz_bgp_management": {
+        "status": "ok",
+        "phase": "1",
+        "freitext": "",
+        "lastModifiedAt": "2025-06-14T07:26:24.063Z",
+        "modifiedBy": "current_user",
+        "klarname": "BGP Management Routing etabliert und in beide Richtungen übermittelte Präfixe überprüft"
+      },
+      "ov_tunnel": {
+        "status": "ok",
+        "phase": "2",
+        "lastModifiedAt": "2025-06-10T15:15:00Z",
+        "modifiedBy": "admin",
+        "klarname": "SD-WAN Overlay Tunnel zum Hub ist etabliert",
+        "freitext": ""
+      },
+      "ov_bgp_ospf": {
+        "status": "ok",
+        "phase": "1",
+        "lastModifiedAt": "2025-06-14T07:26:24.634Z",
+        "modifiedBy": "current_user",
+        "klarname": "BGP/OSPF Routing im / in den Overlay(s) funktioniert",
+        "freitext": ""
+      }
+    },
+    "Standortkonfigurationen": {
+      "sk_securityprofile": {
+        "status": "ok",
+        "phase": "2",
+        "lastModifiedAt": "2025-06-10T16:00:00Z",
+        "modifiedBy": "security_admin",
+        "klarname": "Securityprofile konfiguriert",
+        "freitext": ""
+      },
+      "sk_vpn_tunnel": {
+        "status": "ok",
+        "phase": "2",
+        "lastModifiedAt": "2025-06-10T16:05:00Z",
+        "modifiedBy": "admin",
+        "klarname": "VPN-Tunnel etabliert und funktional",
+        "freitext": ""
+      },
+      "sk_vpn_einwahl": {
+        "status": "abweichung",
+        "phase": "2",
+        "freitext": "Einwahl funktioniert, aber Zertifikat läuft in 30 Tagen ab",
+        "lastModifiedAt": "2025-06-10T16:10:00Z",
+        "modifiedBy": "admin",
+        "klarname": "VPN-Einwahl konfiguriert und getestet"
+      },
+      "sk_lan": {
+        "status": "ok",
+        "phase": "2",
+        "lastModifiedAt": "2025-06-10T16:15:00Z",
+        "modifiedBy": "techniker",
+        "klarname": "LAN Schnittstellen konfiguriert und getestet",
+        "freitext": ""
+      },
+      "sk_dmz_dnat": {
+        "status": "abweichung",
+        "phase": "2",
+        "klarname": "DMZ & DNAT konfiguriert und getestet",
+        "freitext": ""
+      }
+    }
+  }
+}
