@@ -6,11 +6,16 @@ import {Protocol} from "./Protocol.tsx";
 import '@mantine/dates/styles.css';
 import {useEffect, useState} from "react";
 import {DateInput} from "@mantine/dates";
-import jsonData from "../input.json";
 
 function App() {
 
-    const [protocolData, setProtocolData] = useState<ProtocolType>(jsonData);
+
+    const [protocolData, setProtocolData] = useState<ProtocolType>({
+        date: "",
+        phase: "",
+        comment: "",
+        data: {}
+    });
     const [hidePhase1, setHidePhase1] = useState<boolean>(false)
 
     const updateField = (category: string, field: string, newValue: StatusField) => {
@@ -65,7 +70,7 @@ function App() {
     const exportAsJSON = async (generatePdf: boolean = false, sendEmail: boolean = false) => {
         try {
             console.log(JSON.stringify(protocolData, null, 2))
-            const response = await fetch("protocol/edit", {
+            const response = await fetch("/protocol/1", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -95,10 +100,10 @@ function App() {
 
     useEffect(() => {
         const getData = async (id: string) => {
-            const response = await fetch(`protocol/edit/${id}`, {
+            const response = await fetch(`/protocol/${id}`, {
                 method: "GET",
                 headers: {
-                    contentType: "application/json",
+                    "Content-Type": "application/json",
                 }
             })
             if (!response.ok) {
@@ -107,8 +112,8 @@ function App() {
             return response.json()
         }
         //TODO get id from somewhere
-        getData("2").then(data => setProtocolData(data))
-    })
+        getData("1").then(data => setProtocolData(data))
+    }, [])
 
     return (
         <MantineProvider>
