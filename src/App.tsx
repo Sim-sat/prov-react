@@ -1,11 +1,13 @@
 import '@mantine/core/styles.css';
 import './App.css'
-import {Button, Group, MantineProvider, Stack, Textarea} from '@mantine/core';
+import {Button, createTheme, Group, type MantineColorsTuple, MantineProvider, Stack, Textarea} from '@mantine/core';
 import type {ProtocolType, StatusField} from "./Types/Protocol.type.ts";
 import {Protocol} from "./Components/Protocol.tsx";
 import '@mantine/dates/styles.css';
 import {useEffect, useState} from "react";
 import {DateInput} from "@mantine/dates";
+import {Bounce, toast, ToastContainer} from "react-toastify";
+import {HiEye, HiEyeOff} from "react-icons/hi";
 //import jsonData from "./input.json";
 
 function App() {
@@ -69,6 +71,7 @@ function App() {
     };
 
     const exportAsJSON = async (generatePdf: boolean = false, sendEmail: boolean = false) => {
+        const load = toast.loading("Speichern...")
         try {
             console.log(JSON.stringify(protocolData, null, 2))
             const response = await fetch("/protocol/1", {
@@ -82,9 +85,25 @@ function App() {
                     sendEmail,
                 })
             })
+            if (response.ok) {
+                if (generatePdf && !sendEmail) {
+                    toast.update(load, { render: "Gespeichert und Pdf erstellt!", type: "success", isLoading: false, autoClose: 1500 });
+
+                    //toast.success("Gespeichert und Pdf erstellt!")
+                } else if (sendEmail) {
+                    toast.update(load, { render: "Gespeichert, Pdf erstellt und Email geschickt!", type: "success", isLoading: false, autoClose: 1500 });
+
+                    //toast.success("Gespeichert, Pdf erstellt und Email geschickt!")
+                }else {
+                    toast.update(load, { render: "Gespeichert!", type: "success", isLoading: false, autoClose: 1500 });
+
+                    //toast.success("Gespeichert!")
+                }
+            }
             return await response.json();
         } catch (error) {
             console.error("Save failed ", error)
+            toast.update(load, { render: "Fehler beim Speichern", type: "error", isLoading: false, autoClose: 1500 });
             throw error
         }
 
@@ -116,9 +135,48 @@ function App() {
         getData("1").then(data => setProtocolData(data))
     }, [])
 
+    const myGreys: MantineColorsTuple = [
+        '#f8f8f8',
+        '#e7e7e7',
+        '#cdcdcd',
+        '#b2b2b2',
+        '#9a9a9a',
+        '#8b8b8b',
+        '#848484',
+        '#717171',
+        '#656565',
+        '#575757'
+    ];
+
+    const theme = createTheme({
+        colors: {
+            myGreys
+        }
+    })
+
     return (
-        <MantineProvider>
-            <Stack align="center">
+        <MantineProvider
+            forceColorScheme="light"
+            theme={theme}
+        >
+            <ToastContainer
+                position="top-center"
+                autoClose={1500}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick={false}
+                rtl={false}
+                pauseOnFocusLoss={false}
+                draggable
+                pauseOnHover
+                theme="light"
+                transition={Bounce}
+            />
+            <Stack align="center" styles={(theme) => ({
+                root: {
+                    backgroundColor: theme.colors.myGreys[0],
+                }
+            })}>
                 <Stack className="w-full max-w-[1300px] p-10">
                     <p className="text-center mb-5 font-bold text-5xl">Abnahmeprotokoll Phase {protocolData.phase}</p>
                     <Stack gap="xs">
@@ -138,10 +196,14 @@ function App() {
                             onChange={(event) => updateProtocolData({comment: event.currentTarget.value})}
                         />
                     </Stack>
-                    {protocolData.phase === "2" &&
+                    {(protocolData.phase === "2" && !hidePhase1) &&
+                        <Button className="max-w-52 " radius="lg" variant="filled"
+                                onClick={() => setHidePhase1(!hidePhase1)}><p>Phase 1
+                            verstecken</p> <HiEye className="ml-2 size-5" /> </Button>}
+                    {(protocolData.phase === "2" && hidePhase1) &&
                         <Button className="max-w-52" radius="lg" variant="filled"
-                                onClick={() => setHidePhase1(!hidePhase1)}>Phase 1
-                            verstecken</Button>}
+                                onClick={() => setHidePhase1(!hidePhase1)}><p>Phase 1
+                            anzeigen</p> <HiEyeOff className="ml-5 size-5" /> </Button>}
                     {Object.entries(protocolData.data)
                         .filter(([, categoryEntries]) => { //filter to order the categories alphabetically
                             if (protocolData.phase === "2") return true;
