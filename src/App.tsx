@@ -8,11 +8,9 @@ import {useEffect, useState} from "react";
 import {DateInput} from "@mantine/dates";
 import {Bounce, toast, ToastContainer} from "react-toastify";
 import {HiEye, HiEyeOff} from "react-icons/hi";
-//import jsonData from "./input.json";
 
 function App() {
 
-    //testing without api    const [protocolData, setProtocolData] = useState<ProtocolType>(jsonData);
     const [protocolData, setProtocolData] = useState<ProtocolType>({
         date: "",
         phase: "",
